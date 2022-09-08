@@ -6,7 +6,7 @@ This solution has been based on various open-source technologies and tools, incl
 
 ## Networking
 
-![](images/network_architecture_1.png)
+![](Images/network_architecture_1.png)
 
 The entire solution is implemented on a custom VPC in AWS. This VPC is composed of one public subnet and three private subnets, each deployed on a different availability zone (AZ). For security reasons, the EKS cluster is installed on the private subnets and is not accessible from the public Internet. Users can only access the cluster by connecting to an OpenVPN server deployed on the public subnet of the infrastructure. Additionally, for being able to install packages and updates on the nodes of the cluster, a NAT instance is also deployed. 
 
@@ -26,7 +26,7 @@ Another important networking aspect of the infrastructure is the routing of S3 t
 
 #### High availability considerations
 
-![](images/network_architecture_2.png)
+![](Images/network_architecture_2.png)
 
 The network infrastructure described in the previous paragraphs is more suitable for a development or testing environment given that there is only one OpenVPN server instance and one NAT instance. An alternative architecture that would be more suitable for a production environment would consist of three public subnets, each deployed on a different AZ. On each public subnet, a separate OpenVPN server and NAT instance would be deployed. Each private subnet would then forward traffic to the NAT instance deployed within its own AZ. Additionally, a network load balancer would be deployed in front of all OpenVPN server instances. That way, the infrastructure would be able to withstand the loss of up to two availability zones within the AWS region in which the infrastructure is deployed.  For the sake of simplicity and for reducing costs, in this project, we will adopt the simple approach with one public subnet.
 
