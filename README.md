@@ -107,7 +107,30 @@ After the DNS record corresponding to a new service (e.g., a UI) is published in
 The routing of https traffic within the EKS cluster is performed using an nginx ingress controller. When the ingress controller is deployed, a corresponding classic load balancer is created in AWS. This load balancer is responsible to route https request to the appropriate services within the cluster, based on the requested hostname and path. For each new service that should be exposed via https from the EKS cluster, a new ingress rule is created defining the correspond hostname and path. An example of  such an ingress rule corresponding to the spark history server UI is the following:
 
 ```
-
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cert-issuer
+    kubernetes.io/ingress.class: nginx
+  name: spark-history-server
+  namespace: spark
+spec:
+  rules:
+  - host: spark.<route53_domain>
+    http:
+      paths:
+      - backend:
+          service:
+            name: spark-history-server
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - spark.<route53_domain>
+    secretName: spark-history-general-tls
 ```
 
 Based on the above rule, when the nginx ingress controller receives an https request on the hostname "spark.<Route53_domain>", it forwards the request to the spark history server service. All https services (e.g., component UIs) in the EKS cluster are exposed in a similar manner. For being able to forward requests to pods that are deployed in different AZs, cross zone load balancing is enabled in the classic load balancer corresponding to the nginx ingress controller. 
@@ -210,21 +233,21 @@ The history of executed spark applications and their logs are accessible from th
 
 The source code of this repository depends on the Terraform modules defined in the following table:
 
-| Module                                                                                                         | Description                                                                                                                                  |
-| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| [terraform-aws-custom-vpc](https://github.com/gfortetsanakis/terraform-aws-custom-vpc)                         | Creates the VPC of the infrastructure                                                                                                        |
-| [terraform-aws-openvpn-server](https://github.com/gfortetsanakis/terraform-aws-openvpn-server)                 | Deploys on OpenVPN server                                                                                                                    |
-| [terraform-aws-nat-instance](https://github.com/gfortetsanakis/terraform-aws-nat-instance)                     | Deploys a NAT instance                                                                                                                       |
-| [terraform-aws-eks-cluster](https://github.com/gfortetsanakis/terraform-aws-eks-cluster)                       | Creates the EKS cluster                                                                                                                      |
-| [terraform-helm-eks-autoscaler](https://github.com/gfortetsanakis/terraform-helm-eks-autoscaler)               | Installs the [cluster-autoscaler chart](https://github.com/kubernetes/autoscaler/tree/master/charts/cluster-autoscaler)                      |
-| [terraform-helm-efs-csi-driver](https://github.com/gfortetsanakis/terraform-helm-efs-csi-driver)               | Installs the [efs-csi-driver chart](https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/charts/aws-efs-csi-driver) |
-| [terraform-helm-external-dns](https://github.com/gfortetsanakis/terraform-helm-external-dns)                   | Install the [external-dns chart](https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns)    |
-| [terraform-helm-ingress-nginx](https://github.com/gfortetsanakis/terraform-helm-ingress-nginx)                 | Installs the [ingress-nginx chart](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx)                               |
-| [terraform-helm-cert-manager](https://github.com/gfortetsanakis/terraform-helm-cert-manager)                   | Installs the [cert-manager chart](https://github.com/cert-manager/cert-manager/tree/master/deploy/charts/cert-manager)                       |
-| [terraform-helm-kube-prometheus-stack](https://github.com/gfortetsanakis/terraform-helm-kube-prometheus-stack) | Installs the [kube-prometheus-stack chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)       |
-| [terraform-aws-s3-bucket](https://github.com/gfortetsanakis/terraform-aws-s3-bucket)                     | Creates S3 buckets on AWS                                                                                                                    |
-| [terraform-helm-jupyter-hub](https://github.com/gfortetsanakis/terraform-helm-jupyter-hub)                     | Installs the [jupyterHub chart](https://github.com/jupyterhub/helm-chart)                                                                    |
-| [terraform-helm-spark-operator](https://github.com/gfortetsanakis/terraform-helm-spark-operator)               | Installs the [spark-operator chart](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator/tree/master/charts/spark-operator-chart)    |
+| Module                                                                                                         | Description                                                                                                                               |
+| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| [terraform-aws-custom-vpc](https://github.com/gfortetsanakis/terraform-aws-custom-vpc)                         | Creates the VPC of the infrastructure                                                                                                     |
+| [terraform-aws-openvpn-server](https://github.com/gfortetsanakis/terraform-aws-openvpn-server)                 | Deploys on OpenVPN server                                                                                                                 |
+| [terraform-aws-nat-instance](https://github.com/gfortetsanakis/terraform-aws-nat-instance)                     | Deploys a NAT instance                                                                                                                    |
+| [terraform-aws-eks-cluster](https://github.com/gfortetsanakis/terraform-aws-eks-cluster)                       | Creates the EKS cluster                                                                                                                   |
+| [terraform-helm-eks-autoscaler](https://github.com/gfortetsanakis/terraform-helm-eks-autoscaler)               | Installs the [cluster-autoscaler chart](https://github.com/kubernetes/autoscaler/tree/master/charts/cluster-autoscaler)                   |
+| [terraform-helm-efs-csi-driver](https://github.com/gfortetsanakis/terraform-helm-efs-csi-driver)               | Installs the [efs-csi-driver chart](https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/charts/aws-efs-csi-driver)          |
+| [terraform-helm-external-dns](https://github.com/gfortetsanakis/terraform-helm-external-dns)                   | Install the [external-dns chart](https://github.com/kubernetes-sigs/external-dns/tree/master/charts/external-dns)                         |
+| [terraform-helm-ingress-nginx](https://github.com/gfortetsanakis/terraform-helm-ingress-nginx)                 | Installs the [ingress-nginx chart](https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx)                            |
+| [terraform-helm-cert-manager](https://github.com/gfortetsanakis/terraform-helm-cert-manager)                   | Installs the [cert-manager chart](https://github.com/cert-manager/cert-manager/tree/master/deploy/charts/cert-manager)                    |
+| [terraform-helm-kube-prometheus-stack](https://github.com/gfortetsanakis/terraform-helm-kube-prometheus-stack) | Installs the [kube-prometheus-stack chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)    |
+| [terraform-aws-s3-bucket](https://github.com/gfortetsanakis/terraform-aws-s3-bucket)                           | Creates S3 buckets on AWS                                                                                                                 |
+| [terraform-helm-jupyter-hub](https://github.com/gfortetsanakis/terraform-helm-jupyter-hub)                     | Installs the [jupyterHub chart](https://github.com/jupyterhub/helm-chart)                                                                 |
+| [terraform-helm-spark-operator](https://github.com/gfortetsanakis/terraform-helm-spark-operator)               | Installs the [spark-operator chart](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator/tree/master/charts/spark-operator-chart) |
 
 ## Installation instructions
 
@@ -345,3 +368,47 @@ Regarding the spark and Jupyter notebook images, it is necessary to support the 
     ```
 
 #### Examples
+
+An example spark application that can be executed in the cluster after the deployment process has been completed can be found in the Examples directory. 
+
+To run it, perform the following steps:
+
+1. cd to the Examples directory
+   
+   ```
+   cd Examples
+   ```
+
+2. Edit the file "spark-pi.yaml" and replace "<spark-events-logs-bucket>" with the name of the spark logs S3 bucket and "<route53_domain>" with the domain of the private Route53 hosted zone, respectively. Then, submit the application by executing the command:
+   
+   ```
+   kubectl apply -f ./spark-pi.yaml
+   ```
+
+3. After the applications is submitted to the cluster check the status of the driver pod:
+   
+   ```
+   kubectl -n spark describe pod pyspark-pi-driver
+   ```
+   
+   The driver pod should be in pending state given that there are no available nodes in the spot node group yet. An event should appear at the end of the file stating that the cluster autoscaler has performed a scale up action on the spot nodegroup adding an additional EC2 instance:
+   
+   ![](Images\scale_up_event.png)
+
+4. After the new instance is deployed the driver pod should be scheduled and transition to the running state. Then, the driver will try to schedule the executor pods. If the available resources in the cluster are not sufficient for scheduling all the executors, the cluster autoscaler, will again trigger a scale up event adding the required number of EC2 instances for accommodating all executor pods. This can be verified by checking the status of the executor pods.
+
+5. After the execution of the application the logs can be viewed by executing the command:
+   
+   ```
+   kubectl -n spark logs pyspark-pi-driver
+   ```
+
+6. The application event logs can also be accessed via the spark history server UI:
+   
+   ![](Images\spark_history_server.png)
+
+7. During the execution of spark applications, the grafana UI can be used for monitoring the compute resource utilization in the cluster:
+   
+   ![](Images\grafana_dashboard.png)
+
+8. After the execution of the application has been completed, if 10 minutes pass without another application being submitted to the cluster, the autoscaler will trigger a scale down event destroying all unused ec2 instances. 

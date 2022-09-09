@@ -22,7 +22,7 @@ spec:
     ingressTLS:
       - secretName: pyspark-pi-tls
         hosts:
-          - pyspark-pi.<rout53_domain>
+          - pyspark-pi.<route53_domain>
   restartPolicy:
     type: Never
   driver:
@@ -36,7 +36,7 @@ spec:
     serviceAccount: spark-operator-spark
   executor:
     cores: 1
-    instances: 1
+    instances: 3
     memory: "512m"
     nodeSelector:
       eks.amazonaws.com/nodegroup: spot_group

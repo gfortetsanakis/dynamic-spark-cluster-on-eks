@@ -101,7 +101,7 @@ module "cert-manager" {
 
 module "spark-operator" {
   source                     = "gfortetsanakis/spark-operator/helm"
-  version                    = "1.0.6"
+  version                    = "1.0.7"
   namespace                  = var.kubernetes_addons_namespace
   eks_cluster_properties     = module.eks-cluster.eks_cluster_properties
   domain                     = var.domain
