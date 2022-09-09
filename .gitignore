@@ -6,8 +6,8 @@
 *.tfstate
 *.tfstate.*
 
-# terraform.lock.acl file
-.terraform.lock.acl
+# .terraform.lock.hcl file
+.terraform.lock.hcl
 
 # Crash log files
 crash.log
