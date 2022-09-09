@@ -313,7 +313,7 @@ Regarding the spark and Jupyter notebook images, it is necessary to support the 
        max_size       = 6
        instance_types = ["t3.medium"]
        disk_size      = 20
-       capacity_type  = "SPOT"
+       capacity_type  = "ON_DEMAND"
      }
      spot_group = {
        min_size       = 0
