@@ -16,7 +16,7 @@ module "openvpn-server" {
   vpc_id                = module.custom-vpc.vpc_id
   openvpn_key_path      = var.openvpn_key_path
   openvpn_instance_type = var.openvpn_instance_type
-  openvpn_client_ips    = var.openvpn_client_ips
+  openvpn_client_cidrs  = var.openvpn_client_cidrs
   openvpn_subnet_id     = module.custom-vpc.public_subnet_ids[0]
   openvpn_user          = var.openvpn_user
   openvpn_protocol      = "tcp"
