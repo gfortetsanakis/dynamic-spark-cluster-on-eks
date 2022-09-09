@@ -393,7 +393,7 @@ To run it, perform the following steps:
    
    The driver pod should be in pending state given that there are no available nodes in the spot node group yet. An event should appear at the end of the file stating that the cluster autoscaler has performed a scale up action on the spot nodegroup adding an additional EC2 instance:
    
-   ![](Images\scale_up_event.png)
+   ![](Images/scale_up_event.png)
 
 4. After the new instance is deployed the driver pod should be scheduled and transition to the running state. Then, the driver will try to schedule the executor pods. If the available resources in the cluster are not sufficient for scheduling all the executors, the cluster autoscaler, will again trigger a scale up event adding the required number of EC2 instances for accommodating all executor pods. This can be verified by checking the status of the executor pods.
 
@@ -405,10 +405,10 @@ To run it, perform the following steps:
 
 6. The application event logs can also be accessed via the spark history server UI:
    
-   ![](Images\spark_history_server.png)
+   ![](Images/spark_history_server.png)
 
 7. During the execution of spark applications, the grafana UI can be used for monitoring the compute resource utilization in the cluster:
    
-   ![](Images\grafana_dashboard.png)
+   ![](Images/grafana_dashboard.png)
 
 8. After the execution of the application has been completed, if 10 minutes pass without another application being submitted to the cluster, the autoscaler will trigger a scale down event destroying all unused ec2 instances. 
