@@ -13,7 +13,7 @@ spec:
   sparkVersion: 3.2.1"
   sparkConf:
     "spark.eventLog.enabled": "true"
-    "spark.eventLog.dir": "s3a://<spark-events-logs-bucket>/logs/"
+    "spark.eventLog.dir": "s3a://<spark_events_logs_bucket>/logs/"
     "spark.hadoop.fs.s3a.aws.credentials.provider": "com.amazonaws.auth.WebIdentityTokenCredentialsProvider"
   sparkUIOptions:
     ingressAnnotations:

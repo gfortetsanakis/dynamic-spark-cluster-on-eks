@@ -379,7 +379,7 @@ To run it, perform the following steps:
    cd Examples
    ```
 
-2. Edit the file "spark-pi.yaml" and replace "<spark-events-logs-bucket>" with the name of the spark logs S3 bucket and "<route53_domain>" with the domain of the private Route53 hosted zone, respectively. Then, submit the application by executing the command:
+2. Edit the file "spark-pi.yaml" and replace "<spark_events_logs_bucket>" with the name of the spark logs S3 bucket and "<route53_domain>" with the domain of the private Route53 hosted zone, respectively. Then, submit the application by executing the command:
    
    ```
    kubectl apply -f ./spark-pi.yaml
@@ -397,13 +397,13 @@ To run it, perform the following steps:
 
 4. After the new instance is deployed the driver pod should be scheduled and transition to the running state. Then, the driver will try to schedule the executor pods. If the available resources in the cluster are not sufficient for scheduling all the executors, the cluster autoscaler, will again trigger a scale up event adding the required number of EC2 instances for accommodating all executor pods. This can be verified by checking the status of the executor pods.
 
-5. After the execution of the application the logs can be viewed by executing the command:
+5. After the execution of the application, the logs can be viewed by executing the command:
    
    ```
    kubectl -n spark logs pyspark-pi-driver
    ```
 
-6. The application event logs can also be accessed via the spark history server UI:
+6. The application event logs that have been stored on S3 can also be accessed via the spark history server UI:
    
    ![](Images/spark_history_server.png)
 
